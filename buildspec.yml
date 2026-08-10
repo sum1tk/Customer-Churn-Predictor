@@ -1,0 +1,27 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "Installing dependencies..."
+      - pip install -r requirements.txt
+
+  build:
+    commands:
+      - echo "Training and validating model..."
+      - python train.py          # exits non-zero if accuracy < threshold -> fails build
+      - echo "Packaging artifact..."
+      - mkdir -p build_output
+      - cp model.joblib app.py appspec.yml requirements.txt build_output/
+      - cp -r scripts build_output/
+
+  post_build:
+    commands:
+      - echo "Build completed on $(date)"
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: build_output
